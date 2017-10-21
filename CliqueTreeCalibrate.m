@@ -36,15 +36,51 @@ MESSAGES = repmat(struct('var', [], 'card', [], 'val', []), N, N);
 % Remember that you only need an upward pass and a downward pass.
 %
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ if isMax == 1
+	
+ end
+ 
+[i,j] = GetNextCliques(P,MESSAGES);
+while i~=0 && j~=0
+    CommonElement = intersect(P.cliqueList(i).var, P.cliqueList(j).var);
+    EVar = setdiff(P.cliqueList(i).var,CommonElement);
+    T1 = P.edges(:,i);
+    T1(j) = [];
+    T2 = MESSAGES(:,i);
+    T2(j) = [];
+    D = T2(find(T1 == 1));
+    tM = P.cliqueList(i);
+    for p = 1:length(D)
+        tM = FactorProduct(tM,D(p)); 
+    end
+    tM = ComputeMarginal(CommonElement,tM,[]);
+    MESSAGES(i,j) = tM;
+    [i,j] = GetNextCliques(P,MESSAGES);
+end
 
-
+ 
+ 
+ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % YOUR CODE HERE
 %
 % Now the clique tree has been calibrated. 
 % Compute the final potentials for the cliques and place them in P.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+for i = 1:N
+    neighbours = P.edges(i, :);
+    result = P.cliqueList(i);
+    for j = 1:N
+        if neighbours(j) == 1
+            if isMax == 0
+                result = FactorProduct(result, MESSAGES(j, i));
+            else
+                result = FactorSum(result, MESSAGES(j, i));
+            end
+        end
+    end
+    P.cliqueList(i) = result;
+end
 
 
 return

@@ -33,7 +33,33 @@ j = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % YOUR CODE HERE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+N = length(P);
+[A,I] = sort(sum(P.edges,1));
+l = length(I);
+flag = 0;
+for p = 1:l
+    TestList = find(P.edges(I(p),:) == 1);
+    messages(I(p),TestList);
+    for q = 1:length(TestList)
+        if (isempty(messages(I(p),TestList(q)).card))
+            TestReceiveList = find(P.edges(:,I(p)) == 1);
+            TestReceiveList(q,:) = [];
+            tsum = 0;
+            for r = 1:length(TestReceiveList)
+                tsum = tsum + isempty(messages(TestReceiveList(r),I(p)).card);
+            end
+            if tsum == 0
+                i = I(p) ;
+                j = TestList(q) ;
+                flag = 1;
+                break
+            end
+        end
+        if flag == 1
+            break
+        end
+    end
+end
 
 return;
+

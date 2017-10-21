@@ -12,7 +12,7 @@
 %
 % Copyright (C) Daphne Koller, Stanford University, 2012
 
-      
+
 function M = ComputeMarginal(V, F, E)
 
 % Check for empty factor list

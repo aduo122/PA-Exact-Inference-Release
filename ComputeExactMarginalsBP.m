@@ -38,10 +38,18 @@ for i = 1:length(P.cliqueList)
     for j = 1: length(P.cliqueList(i).var)
         id = find(V==(P.cliqueList(i).var(j)));
         if isempty(M(id).var)
-            t = FactorMarginalization(P.cliqueList(i), setdiff(P.cliqueList(i).var, P.cliqueList(i).var(j)))
-            M(id).var = t.var;
-            M(id).card = t.card;
-            M(id).val = 1/sum(t.val) * t.val;
+            if (isMax)
+                DifferElement = setdiff(P.cliqueList(i).var,P.cliqueList(i).var(j));
+                t = FactorMaxMarginalization(P.cliqueList(i),DifferElement);
+                M(id).var = t.var;
+                M(id).card = t.card;
+                M(id).val = t.val;
+            else
+                t = FactorMarginalization(P.cliqueList(i), setdiff(P.cliqueList(i).var, P.cliqueList(i).var(j)));
+                M(id).var = t.var;
+                M(id).card = t.card;
+                M(id).val = 1/sum(t.val) * t.val;
+            end
         end
     end   
 end

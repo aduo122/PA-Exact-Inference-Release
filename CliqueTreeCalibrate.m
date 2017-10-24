@@ -36,13 +36,16 @@ MESSAGES = repmat(struct('var', [], 'card', [], 'val', []), N, N);
 % Remember that you only need an upward pass and a downward pass.
 %
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- if isMax == 1
-	
- end
+if (isMax)
+  for i = 1:length(P.cliqueList)
+    P.cliqueList(i).val =  log(P.cliqueList(i).val);
+  end
+end
  
 [i,j] = GetNextCliques(P,MESSAGES);
 while i~=0 && j~=0
     CommonElement = intersect(P.cliqueList(i).var, P.cliqueList(j).var);
+    DifferElement = setdiff(P.cliqueList(i).var, CommonElement);
     EVar = setdiff(P.cliqueList(i).var,CommonElement);
     T1 = P.edges(:,i);
     T1(j) = [];
@@ -51,9 +54,18 @@ while i~=0 && j~=0
     D = T2(find(T1 == 1));
     tM = P.cliqueList(i);
     for p = 1:length(D)
-        tM = FactorProduct(tM,D(p)); 
+        if (isMax)
+            tM = FactorSum(tM,D(p)); 
+        else
+            tM = FactorProduct(tM,D(p));
+        end
+        
     end
-    tM = ComputeMarginal(CommonElement,tM,[]);
+    if (isMax)
+        tM = FactorMaxMarginalization(tM,DifferElement);
+    else
+        tM = ComputeMarginal(CommonElement,tM,[]);
+    end
     MESSAGES(i,j) = tM;
     [i,j] = GetNextCliques(P,MESSAGES);
 end
